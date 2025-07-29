@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quiz Interface</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #f4f4f4;
+    }
+
+    header {
+      background: #1f2937;
+      color: white;
+      padding: 20px;
+      text-align: center;
+      position: relative;
+    }
+
+    .header-logo {
+      height: 50px;
+      position: absolute;
+      left: 20px;
+      top: 10px;
+    }
+
+    .event-title {
+      font-size: 24px;
+      margin: 5px 0;
+    }
+
+    .college-name {
+      font-size: 18px;
+      color: #d1d5db;
+    }
+
+    .quiz-container {
+      display: flex;
+    }
+
+    .sidebar {
+      width: 250px;
+      background: #111827;
+      color: white;
+      padding: 20px;
+      display: none;
+      flex-shrink: 0;
+    }
+
+    .sidebar h3 {
+      margin-top: 0;
+    }
+
+    .sidebar ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .sidebar ul li {
+      padding: 10px;
+      background: #374151;
+      margin-bottom: 5px;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+
+    .toggle-btn {
+      position: absolute;
+      left: 10px;
+      top: 80px;
+      font-size: 30px;
+      cursor: pointer;
+      color: #1f2937;
+    }
+
+    .quiz-content {
+      flex: 1;
+      padding: 40px;
+      position: relative;
+    }
+
+    .question-box {
+      display: none;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    .question-box.active {
+      display: block;
+    }
+
+    .options {
+      margin-top: 15px;
+    }
+
+    .options label {
+      display: block;
+      margin-bottom: 10px;
+    }
+
+    .navigation {
+      margin-top: 20px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .timer {
+      font-size: 18px;
+      color: #dc2626;
+      font-weight: bold;
+    }
+
+    .footer {
+      text-align: center;
+      font-size: 14px;
+      margin-top: 20px;
+      color: gray;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <img src="logo.png" alt="Logo" class="header-logo" />
+    <div class="college-name">Your College Name</div>
+    <div class="event-title">Event Name - Quiz</div>
+    <div class="toggle-btn" onclick="toggleSidebar()">⋮</div>
+  </header>
+
+  <div class="quiz-container">
+    <div class="sidebar" id="sidebar">
+      <h3>Questions</h3>
+      <ul id="questionList">
+        <!-- Dynamically Filled -->
+      </ul>
+    </div>
+
+    <div class="quiz-content">
+      <div id="timer" class="timer">Time Left: 60s</div>
+
+      <!-- Questions -->
+      <div class="question-box active" id="q0">
+        <h3>Question 1: What is HTML?</h3>
+        <div class="options">
+          <label><input type="radio" name="q0" /> A) Programming Language</label>
+          <label><input type="radio" name="q0" /> B) Markup Language</label>
+          <label><input type="radio" name="q0" /> C) Operating System</label>
+          <label><input type="radio" name="q0" /> D) None of the above</label>
+        </div>
+      </div>
+
+      <div class="question-box" id="q1">
+        <h3>Question 2: What does CSS stand for?</h3>
+        <div class="options">
+          <label><input type="radio" name="q1" /> A) Creative Style Sheet</label>
+          <label><input type="radio" name="q1" /> B) Computer Style Sheet</label>
+          <label><input type="radio" name="q1" /> C) Cascading Style Sheets</label>
+          <label><input type="radio" name="q1" /> D) None</label>
+        </div>
+      </div>
+
+      <!-- Add More Questions Same Way -->
+
+      <div class="navigation">
+        <button onclick="prevQuestion()">⟵ Prev</button>
+        <button onclick="nextQuestion()">Next ⟶</button>
+      </div>
+
+      <div class="footer">Powered by ESCORT TECH HUB</div>
+    </div>
+  </div>
+
+  <script>
+    let currentQuestion = 0;
+    const totalQuestions = document.querySelectorAll('.question-box').length;
+    let timer = 60;
+    let interval;
+
+    function showQuestion(index) {
+      document.querySelectorAll('.question-box').forEach(q => q.classList.remove('active'));
+      document.getElementById(`q${index}`).classList.add('active');
+      currentQuestion = index;
+      resetTimer();
+    }
+
+    function nextQuestion() {
+      if (currentQuestion < totalQuestions - 1) {
+        showQuestion(currentQuestion + 1);
+      }
+    }
+
+    function prevQuestion() {
+      if (currentQuestion > 0) {
+        showQuestion(currentQuestion - 1);
+      }
+    }
+
+    function resetTimer() {
+      clearInterval(interval);
+      timer = 60;
+      document.getElementById('timer').innerText = `Time Left: ${timer}s`;
+      interval = setInterval(() => {
+        timer--;
+        document.getElementById('timer').innerText = `Time Left: ${timer}s`;
+        if (timer === 0) {
+          clearInterval(interval);
+          nextQuestion();
+        }
+      }, 1000);
+    }
+
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      sidebar.style.display = sidebar.style.display === 'block' ? 'none' : 'block';
+    }
+
+    function initSidebar() {
+      const list = document.getElementById('questionList');
+      for (let i = 0; i < totalQuestions; i++) {
+        const li = document.createElement('li');
+        li.innerText = `Question ${i + 1}`;
+        li.onclick = () => showQuestion(i);
+        list.appendChild(li);
+      }
+    }
+
+    window.onload = () => {
+      initSidebar();
+      resetTimer();
+    };
+  </script>
+  
+</body>
+</html>
